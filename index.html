@@ -14,6 +14,14 @@
       color: #333;
       padding: 20px;
     }
+    #header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #header img {
+      height: 80px;
+      object-fit: contain;
+    }
     h1 {
       text-align: center;
       margin-bottom: 5px;
@@ -33,6 +41,19 @@
     #filters button.active {
       background: #333;
       color: #fff;
+    }
+    #requirements {
+      margin-bottom: 20px;
+    }
+    #requirements h2 {
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    #req-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     #credit-counter {
       text-align: center;
@@ -87,7 +108,7 @@
       white-space: nowrap; font-size: 0.85em; margin-top: 4px;
       z-index: 10;
     }
-    /* Categorías */
+    /* Colores por categoría */
     .course.plan      { background: #1565C0; color: #fff; }
     .course.taller    { background: #FBC02D; }
     .course.formacion { background: #C62828; color: #fff; }
@@ -105,9 +126,8 @@
          alt="Logo Facultad de Agronomía y Sistemas Naturales UC">
   </div>
   
+  <!-- 2) Título y filtros -->
   <h1>Malla Curricular Interactiva – <span id="career-name"></span></h1>
-
-  <!-- FILTROS -->
   <div id="filters">
     <button data-cat="all" class="active">Todas</button>
     <button data-cat="plan">Plan común</button>
@@ -119,6 +139,13 @@
     <button data-cat="minor1">Minor 1</button>
   </div>
 
+  <!-- 3) Sección de requisitos fuera de semestres -->
+  <div id="requirements">
+    <h2>Requisitos adicionales</h2>
+    <div id="req-list"></div>
+  </div>
+
+  <!-- 4) Contador y grid -->
   <div id="credit-counter">Créditos aprobados: 0</div>
   <div id="grid"></div>
   <script>
@@ -161,6 +188,33 @@
         "prereqs": [],
         "optional": false,
         "category": "taller"
+      },
+      {
+        "id": "TESTING",
+        "name": "Test de Inglés",
+        "year": 1,
+        "credits": "0",
+        "prereqs": [],
+        "optional": false,
+        "category": "extra"
+      },
+      {
+        "id": "BIO141T",
+        "name": "Test de Biología de La Célula",
+        "year": 1,
+        "credits": "0",
+        "prereqs": [],
+        "optional": false,
+        "category": "extra"
+      },
+      {
+        "id": "VRA100C",
+        "name": "Examen de Comunicación Escrita",
+        "year": 1,
+        "credits": "0",
+        "prereqs": [],
+        "optional": false,
+        "category": "extra"
       },
       {
         "id": "MAT1100",
@@ -551,59 +605,60 @@
       }
 
     ];
-    // 2) Categoría activa para filtrado
+    // 2) Filtro activo
     let activeCategory = 'all';
 
-    // 3) Progreso
+    // 3) Estado en localStorage
     const STORAGE_KEY = 'curricularProgress';
     let progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-    const saveProgress  = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    const isApproved    = id => !!progress[id];
-    const isAvailable   = c  => c.optional || c.prereqs.every(pid => isApproved(pid));
-    const toggleCourse  = c  => {
+    // 4) Helpers
+    const saveProgress = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const isApproved   = id => !!progress[id];
+    const isAvailable  = c  => c.optional || c.prereqs.every(pid => isApproved(pid));
+    const toggleCourse = c  => {
       if (!isApproved(c.id) && !isAvailable(c)) return;
       isApproved(c.id) ? delete progress[c.id] : progress[c.id] = true;
-      saveProgress(); render();
+      saveProgress();
+      render();
     };
 
     function updateCreditCounter() {
       const total = courses.reduce((sum, c) =>
         sum + (isApproved(c.id) ? Number(c.credits) : 0)
       , 0);
-      document.getElementById('credit-counter')
-              .textContent = `Créditos aprobados: ${total}`;
+      document.getElementById('credit-counter').textContent =
+        `Créditos aprobados: ${total}`;
     }
 
+    // 5) Render completo
     function render() {
-      // 3a) Render de requisitos
+      // 5a) Requisitos
       const reqList = document.getElementById('req-list');
       reqList.innerHTML = '';
-      courses
-        .filter(c => c.requirement)
-        .forEach(c => {
-          const el = document.createElement('div');
-          const appr  = isApproved(c.id);
-          const avail = isAvailable(c);
-          el.className = `course ${c.category}`;
-          if (appr)      el.classList.add('approved');
-          else if (!avail) el.classList.add('blocked');
-          el.innerHTML = `
-            ${c.name}
-            <span class="credits">(${c.credits} cr)</span>
-          `;
-          if (!appr && !avail) {
-            const miss = c.prereqs.filter(pid => !isApproved(pid)).join(', ');
-            el.dataset.tooltip = 'Falta aprobar: ' + miss;
-          }
-          el.addEventListener('click', () => toggleCourse(c));
-          reqList.appendChild(el);
-        });
+      courses.filter(c => c.requirement).forEach(c => {
+        const el = document.createElement('div');
+        const appr  = isApproved(c.id),
+              avail = isAvailable(c);
+        el.className = `course ${c.category}`;
+        if      (appr)   el.classList.add('approved');
+        else if (!avail) el.classList.add('blocked');
+        el.innerHTML = `
+          ${c.name}
+          <span class="credits">(${c.credits} cr)</span>
+        `;
+        if (!appr && !avail) {
+          const miss = c.prereqs.filter(pid => !isApproved(pid)).join(', ');
+          el.dataset.tooltip = 'Falta aprobar: ' + miss;
+        }
+        el.addEventListener('click', () => toggleCourse(c));
+        reqList.appendChild(el);
+      });
 
-      // 3b) Render de la malla por semestres
+      // 5b) Grid semestres
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      for (let sem = 1; sem <= 8; sem++) {
+      for (let sem=1; sem<=8; sem++) {
         const col = document.createElement('div');
         col.className = 'column';
         const h2 = document.createElement('h2');
@@ -615,11 +670,11 @@
           .filter(c => activeCategory === 'all' || c.category === activeCategory)
           .forEach(c => {
             const el = document.createElement('div');
-            const appr  = isApproved(c.id);
-            const avail = isAvailable(c);
+            const appr  = isApproved(c.id),
+                  avail = isAvailable(c);
             el.className = `course ${c.category}`;
-            if      (appr)      el.classList.add('approved');
-            else if (!avail)    el.classList.add('blocked');
+            if      (appr)   el.classList.add('approved');
+            else if (!avail) el.classList.add('blocked');
             el.innerHTML = `
               ${c.name}
               <span class="credits">(${c.credits} cr)</span>
@@ -638,14 +693,11 @@
       updateCreditCounter();
     }
 
-    // Inicializa
+    // 6) Inicializar y bind filtros
     render();
-
-    // Manejador de filtros
     document.querySelectorAll('#filters button').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelector('#filters button.active')
-                .classList.remove('active');
+        document.querySelector('#filters button.active').classList.remove('active');
         btn.classList.add('active');
         activeCategory = btn.dataset.cat;
         render();
