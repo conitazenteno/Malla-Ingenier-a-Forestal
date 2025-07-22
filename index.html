@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,16 +16,8 @@
       color: #333;
       padding: 20px;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    #credit-counter {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 1.1em;
-      font-weight: bold;
-    }
+    h1 { text-align: center; margin-bottom: 10px; }
+    #credit-counter { text-align: center; margin-bottom: 30px; font-size: 1.1em; font-weight: bold; }
     #grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -39,144 +30,300 @@
       padding: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .column h2 {
-      text-align: center;
-      font-size: 1.2em;
-      margin-bottom: 10px;
-    }
+    .column h2 { text-align: center; font-size: 1.2em; margin-bottom: 10px; }
     .course {
-      padding: 8px;
-      margin-bottom: 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      position: relative;
-      transition: transform .1s;
+      padding: 8px; margin-bottom: 8px; border-radius: 4px;
+      cursor: pointer; position: relative; transition: transform .1s;
     }
     .course:hover { transform: scale(1.02); }
     .course.available { background: var(--color-available); }
-    .course.approved {
-      background: var(--color-approved);
-      text-decoration: line-through;
-    }
-    .course.blocked {
-      background: var(--color-blocked);
-      color: #999;
-      cursor: default;
-    }
+    .course.approved { background: var(--color-approved); text-decoration: line-through; }
+    .course.blocked { background: var(--color-blocked); color: #999; cursor: default; }
     .course .credits {
-      float: right;
-      font-size: 0.85em;
-      color: #555;
+      float: right; font-size: 0.85em; color: #555;
     }
     .course.blocked:hover::after {
       content: attr(data-tooltip);
-      position: absolute;
-      top: 100%; left: 50%;
+      position: absolute; top: 100%; left: 50%;
       transform: translateX(-50%);
       background: #333; color: #fff;
-      padding: 5px 8px;
-      border-radius: 4px;
-      white-space: nowrap;
-      font-size: 0.85em;
-      margin-top: 4px;
-      z-index: 10;
+      padding: 5px 8px; border-radius: 4px;
+      white-space: nowrap; font-size: 0.85em; margin-top: 4px; z-index: 10;
     }
   </style>
 </head>
 <body>
-
   <h1>Malla Curricular Interactiva – <span id="career-name"></span></h1>
   <div id="credit-counter">Créditos aprobados: 0</div>
   <div id="grid"></div>
-
   <script>
-    // Nombre de la carrera
     const careerName = "Ingeniería Forestal UC";
     document.getElementById('career-name').textContent = careerName;
 
-    // Lista de cursos (añade aquí todos tus cursos)
     const courses = [
-      { id: "MAT1000", name: "Precálculo",           year:1, credits:10, prereqs:[] },
-      { id: "QIM201G",name:"Química",                year:1, credits:10, prereqs:[] },
-      { id: "AGL101", name:"Botánica",               year:1, credits:10, prereqs:[] },
-      { id: "MAT1100",name:"Cálculo 1",              year:2, credits:10, prereqs:["MAT1000"] },
-      { id: "QIM202", name:"Bioquímica",             year:2, credits:10, prereqs:["QIM201G"] },
-      { id: "MAT1220",name:"Cálculo 2",              year:3, credits:10, prereqs:["MAT1100"] },
-      { id: "BIO211G",name:"Fisiología Vegetal",     year:3, credits:10, prereqs:["AGL101"] },
-      { id: "AGL201", name:"Estadística",            year:4, credits:10, prereqs:["MAT1220"] },
-      { id: "AGL203", name:"Genética",               year:4, credits:10, prereqs:["BIO211G"] },
-      // ... semestres 5-6 major ...
-      { id:"AGR200", name:"Ecología Forestal",       year:5, credits:10, prereqs:[] },
-      { id:"AGL110", name:"Suelos y Fertilidad",     year:5, credits:10, prereqs:[] },
-      { id:"AGL112", name:"Climatología",            year:5, credits:10, prereqs:[] },
-      { id:"AGR209", name:"Biodiversidad Vegetal",   year:6, credits:10, prereqs:[] },
-      { id:"AGR212", name:"Muestreo y Dinámica",     year:6, credits:10, prereqs:[] },
-      { id:"AGR220", name:"Silvicultura Bosque Nativo",year:6,credits:10, prereqs:[] },
-      // ... semestres 7-8 minor 1 ...
-      { id:"AGR305", name:"Ciencia y Manejo del Fuego", year:7, credits:10, prereqs:[], optional:true },
-      { id:"AGE320", name:"Economía de los Recursos Naturales",year:7,credits:10,prereqs:[], optional:true },
-      { id:"AGR306", name:"Estructura e Industria de la Madera",year:7,credits:10,prereqs:[], optional:true },
-      { id:"AGR304", name:"Arbolado Urbano",          year:7, credits:10, prereqs:[], optional:true },
-      { id:"AGR309", name:"Restauración Ecológica",   year:7, credits:10, prereqs:[], optional:true },
-      // ... más cursos ...
+      {
+        "id": "MAT1000",
+        "name": "Precálculo",
+        "year": 1,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "QIM201G",
+        "name": "Química",
+        "year": 1,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGL101",
+        "name": "Botánica",
+        "year": 1,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "MAT1100",
+        "name": "Cálculo 1",
+        "year": 2,
+        "credits": "10",
+        "prereqs": ["MAT1000"],
+        "optional": false
+      },
+      {
+        "id": "QIM202",
+        "name": "Bioquímica",
+        "year": 2,
+        "credits": "10",
+        "prereqs": ["QIM201G"],
+        "optional": false
+      },
+      {
+        "id": "BIO211G",
+        "name": "Fisiología Vegetal",
+        "year": 3,
+        "credits": "10",
+        "prereqs": ["AGL101"],
+        "optional": false
+      },
+      {
+        "id": "MAT1220",
+        "name": "Cálculo 2",
+        "year": 3,
+        "credits": "10",
+        "prereqs": ["MAT1100"],
+        "optional": false
+      },
+      {
+        "id": "AGL201",
+        "name": "Estadística",
+        "year": 4,
+        "credits": "10",
+        "prereqs": ["MAT1220"],
+        "optional": false
+      },
+      {
+        "id": "AGL203",
+        "name": "Genética",
+        "year": 4,
+        "credits": "10",
+        "prereqs": ["BIO211G"],
+        "optional": false
+      },
+      {
+        "id": "AGR200",
+        "name": "Ecología Forestal",
+        "year": 5,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGL110",
+        "name": "Suelos y Fertilidad",
+        "year": 5,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGL112",
+        "name": "Climatología",
+        "year": 5,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR209",
+        "name": "Biodiversidad Vegetal",
+        "year": 6,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR212",
+        "name": "Muestreo y Dinámica de Bosques",
+        "year": 6,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR220",
+        "name": "Silvicultura del Bosque Nativo",
+        "year": 6,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGE206",
+        "name": "Intro. a la Economía Ambiental y RRNN",
+        "year": 6,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR205",
+        "name": "Geomática Aplicada a los RRNN",
+        "year": 6,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR339",
+        "name": "Conservación y Biodiversidad",
+        "year": 6,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR301",
+        "name": "Sanidad Forestal",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR302",
+        "name": "Manejo y Planificación Forestal",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR303",
+        "name": "Silvicultura Avanzada",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGR305",
+        "name": "Ciencia y Manejo del Fuego",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": true
+      },
+      {
+        "id": "AGE320",
+        "name": "Economía de los Recursos Naturales",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": true
+      },
+      {
+        "id": "AGR306",
+        "name": "Estructura e Industria de la Madera",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": true
+      },
+      {
+        "id": "AGR304",
+        "name": "Arbolado Urbano",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": true
+      },
+      {
+        "id": "AGR309",
+        "name": "Restauración Ecológica",
+        "year": 7,
+        "credits": "10",
+        "prereqs": [],
+        "optional": true
+      }
     ];
 
-    // Gestión de progreso
     const STORAGE_KEY = 'curricularProgress';
-    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
+    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-    function saveProgress(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
-    function isApproved(id){ return !!progress[id]; }
-    function isAvailable(c){
-      if(c.optional) return true;
-      return c.prereqs.every(pid=>isApproved(pid));
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
     }
-    function toggleCourse(c){
-      if(!isApproved(c.id) && !isAvailable(c)) return;
-      if(isApproved(c.id)) delete progress[c.id];
-      else progress[c.id]=true;
+    function isApproved(id) {
+      return !!progress[id];
+    }
+    function isAvailable(course) {
+      return course.optional || course.prereqs.every(pid => isApproved(pid));
+    }
+    function toggleCourse(course) {
+      if (!isApproved(course.id) && !isAvailable(course)) return;
+      if (isApproved(course.id)) delete progress[course.id];
+      else progress[course.id] = true;
       saveProgress();
       render();
     }
-
-    function updateCreditCounter(){
-      const total = courses.reduce((sum, c)=> sum + (isApproved(c.id)? c.credits*1 : 0), 0);
+    function updateCreditCounter() {
+      let total = 0;
+      courses.forEach(c => {
+        if (isApproved(c.id)) total += Number(c.credits);
+      });
       document.getElementById('credit-counter').textContent = `Créditos aprobados: ${total}`;
     }
-
-    function render(){
+    function render() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      // solo semestres 1 a 8
-      for(let sem=1;sem<=8;sem++){
+      for (let sem = 1; sem <= 8; sem++) {
         const col = document.createElement('div');
-        col.className='column';
+        col.className = 'column';
         const h2 = document.createElement('h2');
-        h2.textContent = 'Semestre '+sem;
+        h2.textContent = 'Semestre ' + sem;
         col.appendChild(h2);
-        courses.filter(c=>c.year===sem).forEach(c=>{
-          const el=document.createElement('div');
-          const appr=isApproved(c.id), avail=isAvailable(c);
-          el.className='course '+(appr?'approved':avail?'available':'blocked');
-          el.innerHTML=`${c.name} (${c.id})<span class="credits">(${c.credits} cr)</span>`;
-          if(!appr && !avail){
-            const miss=c.prereqs.filter(pid=>!isApproved(pid)).join(', ');
-            el.dataset.tooltip='Falta aprobar: '+miss;
+        courses.filter(c => c.year === sem).forEach(c => {
+          const el = document.createElement('div');
+          const appr = isApproved(c.id), avail = isAvailable(c);
+          el.className = 'course ' + (appr ? 'approved' : avail ? 'available' : 'blocked');
+          el.innerHTML = `${c.name} (${c.id}) <span class="credits">(${c.credits} cr)</span>`;
+          if (!appr && !avail) {
+            const missing = c.prereqs.filter(pid => !isApproved(pid)).join(', ');
+            el.dataset.tooltip = 'Falta aprobar: ' + missing;
           }
-          el.addEventListener('click',()=>toggleCourse(c));
+          el.addEventListener('click', () => toggleCourse(c));
           col.appendChild(el);
         });
         grid.appendChild(col);
       }
       updateCreditCounter();
     }
-
     render();
   </script>
 </body>
 </html>
 
-    render();
-  </script>
-</body>
-</html>
