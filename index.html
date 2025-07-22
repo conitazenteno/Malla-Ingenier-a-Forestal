@@ -6,8 +6,7 @@
   <style>
     :root {
       --color-approved: #c8e6c9;
-      --color-available: #bbdefb;
-      --color-blocked: #f0f0f0;
+      --color-blocked:  #f0f0f0;
       --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     body {
@@ -16,8 +15,16 @@
       color: #333;
       padding: 20px;
     }
-    h1 { text-align: center; margin-bottom: 10px; }
-    #credit-counter { text-align: center; margin-bottom: 30px; font-size: 1.1em; font-weight: bold; }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    #credit-counter {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
     #grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -30,26 +37,48 @@
       padding: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .column h2 { text-align: center; font-size: 1.2em; margin-bottom: 10px; }
-    .course {
-      padding: 8px; margin-bottom: 8px; border-radius: 4px;
-      cursor: pointer; position: relative; transition: transform .1s;
+    .column h2 {
+      text-align: center;
+      font-size: 1.2em;
+      margin-bottom: 10px;
     }
-    .course:hover { transform: scale(1.02); }
-    .course.available { background: var(--color-available); }
-    .course.approved { background: var(--color-approved); text-decoration: line-through; }
-    .course.blocked { background: var(--color-blocked); color: #999; cursor: default; }
+    .course {
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      transition: transform .1s;
+    }
+    .course:hover {
+      transform: scale(1.02);
+    }
     .course .credits {
-      float: right; font-size: 0.85em; color: #555;
+      float: right;
+      font-size: 0.85em;
+      color: #555;
+    }
+    /* Estados */
+    .course.approved {
+      background: var(--color-approved);
+      text-decoration: line-through;
+    }
+    .course.blocked {
+      background: var(--color-blocked);
+      color: #999;
+      cursor: default;
     }
     .course.blocked:hover::after {
       content: attr(data-tooltip);
-      position: absolute; top: 100%; left: 50%;
+      position: absolute;
+      top: 100%; left: 50%;
       transform: translateX(-50%);
       background: #333; color: #fff;
       padding: 5px 8px; border-radius: 4px;
-      white-space: nowrap; font-size: 0.85em; margin-top: 4px; z-index: 10;
+      white-space: nowrap; font-size: 0.85em; margin-top: 4px;
+      z-index: 10;
     }
+    /* Colores por categoría */
     .course.plan      { background: #1565C0; color: #fff; }
     .course.taller    { background: #FBC02D; }
     .course.formacion { background: #C62828; color: #fff; }
@@ -236,7 +265,7 @@
         "year": 4,
         "credits": "10",
         "prereqs": [],
-        "optional": false
+        "optional": false,
         "category": "major"
       },
       {
@@ -490,12 +519,15 @@
     function saveProgress() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
     }
+
     function isApproved(id) {
       return !!progress[id];
     }
+
     function isAvailable(course) {
       return course.optional || course.prereqs.every(pid => isApproved(pid));
     }
+
     function toggleCourse(course) {
       if (!isApproved(course.id) && !isAvailable(course)) return;
       if (isApproved(course.id)) delete progress[course.id];
@@ -503,39 +535,70 @@
       saveProgress();
       render();
     }
+
     function updateCreditCounter() {
-      let total = 0;
-      courses.forEach(c => {
-        if (isApproved(c.id)) total += Number(c.credits);
-      });
-      document.getElementById('credit-counter').textContent = `Créditos aprobados: ${total}`;
+      const total = courses.reduce((sum, c) => (
+        sum + (isApproved(c.id) ? Number(c.credits) : 0)
+      ), 0);
+      document.getElementById('credit-counter').textContent =
+        `Créditos aprobados: ${total}`;
     }
+
     function render() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
+
       for (let sem = 1; sem <= 8; sem++) {
         const col = document.createElement('div');
         col.className = 'column';
+
         const h2 = document.createElement('h2');
         h2.textContent = 'Semestre ' + sem;
         col.appendChild(h2);
-        courses.filter(c => c.year === sem).forEach(c => {
-          const el = document.createElement('div');
-          const appr = isApproved(c.id), avail = isAvailable(c);
-          el.className = `course ${c.category}`;
-          el.innerHTML = `${c.name} (${c.id}) <span class="credits">(${c.credits} cr)</span>`;
-          if (appr)    el.classList.add('approved');
-else      if (!avail) el.classList.add('blocked');
-            const missing = c.prereqs.filter(pid => !isApproved(pid)).join(', ');
-            el.dataset.tooltip = 'Falta aprobar: ' + missing;
-          }
-          el.addEventListener('click', () => toggleCourse(c));
-          col.appendChild(el);
-        });
+
+        courses
+          .filter(c => c.year === sem)
+          .forEach(c => {
+            const el   = document.createElement('div');
+            const appr = isApproved(c.id);
+            const avail= isAvailable(c);
+
+            // clase base + categoría
+            el.className = `course ${c.category}`;
+
+            // estado aprobado / bloqueado
+            if      (appr)        el.classList.add('approved');
+            else if (!avail)      el.classList.add('blocked');
+
+            // contenido
+            el.innerHTML = `
+              ${c.name}
+              <span class="credits">(${c.credits} cr)</span>
+            `;
+
+            // tooltip en bloqueados
+            if (!appr && !avail) {
+              const missing = c.prereqs
+                .filter(pid => !isApproved(pid))
+                .join(', ');
+              el.dataset.tooltip = 'Falta aprobar: ' + missing;
+            }
+
+            el.addEventListener('click', () => toggleCourse(c));
+            col.appendChild(el);
+          });
+
         grid.appendChild(col);
       }
+
       updateCreditCounter();
     }
+
+    // inicializa
+    render();
+  </script>
+</body>
+</html>
     render();
   </script>
 </body>
