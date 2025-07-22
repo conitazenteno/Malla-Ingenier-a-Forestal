@@ -73,15 +73,23 @@
         "id": "QIM201G",
         "name": "Química",
         "year": 1,
+        "credits": "15",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "BIO108A",
+        "name": "Fundamentos de Ecología",
+        "year": 1,
         "credits": "10",
         "prereqs": [],
         "optional": false
       },
       {
-        "id": "AGL101",
-        "name": "Botánica",
+        "id": "AGL030",
+        "name": "Taller de Sistemas Agrícolas y Forestales 1",
         "year": 1,
-        "credits": "10",
+        "credits": "5",
         "prereqs": [],
         "optional": false
       },
@@ -102,11 +110,35 @@
         "optional": false
       },
       {
+        "id": "AGL101",
+        "name": "Botánica",
+        "year": 2,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "AGL040",
+        "name": "Taller de Sistemas Agrícolas y Forestales 2",
+        "year": 2,
+        "credits": "5",
+        "prereqs": ["AGL030"],
+        "optional": false
+      },
+      {
+        "id": "FIL2001",
+        "name": "Filosofía ¿Para qué?",
+        "year": 2,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
         "id": "BIO211G",
         "name": "Fisiología Vegetal",
         "year": 3,
         "credits": "10",
-        "prereqs": ["AGL101"],
+        "prereqs": ["AGL101", "BIO141T", "QIM202"],
         "optional": false
       },
       {
@@ -118,19 +150,51 @@
         "optional": false
       },
       {
+        "id": "AGL112",
+        "name": "Climatología",
+        "year": 3,
+        "credits": "10",
+        "prereqs": ["MAT1100", "AGL030", "QIM202"],
+        "optional": false
+      },
+      {
+        "id": "",
+        "name": "Formación General",
+        "year": 3,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
+        "id": "EAE105A",
+        "name": "Introducción a la Economía",
+        "year": 3,
+        "credits": "10",
+        "prereqs": [],
+        "optional": false
+      },
+      {
         "id": "AGL201",
         "name": "Estadística",
         "year": 4,
         "credits": "10",
-        "prereqs": ["MAT1220"],
+        "prereqs": ["MAT1100"],
         "optional": false
       },
       {
         "id": "AGL203",
-        "name": "Genética",
+        "name": "Genética y Biotecnología",
         "year": 4,
         "credits": "10",
-        "prereqs": ["BIO211G"],
+        "prereqs": ["BIO141T"],
+        "optional": false
+      },
+      {
+        "id": "AGL110",
+        "name": "Suelos y Fertilidad",
+        "year": 4,
+        "credits": "10",
+        "prereqs": ["QIM202", "BIO211G"],
         "optional": false
       },
       {
