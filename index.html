@@ -6,7 +6,6 @@
   <style>
     :root {
       --color-approved: #c8e6c9;
-      --color-blocked:  #f0f0f0;
       --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     body {
@@ -17,12 +16,27 @@
     }
     h1 {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
+    }
+    #filters {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #filters button {
+      margin: 0 5px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    #filters button.active {
+      background: #333;
+      color: #fff;
     }
     #credit-counter {
       text-align: center;
-      margin-bottom: 30px;
-      font-size: 1.1em;
+      margin-bottom: 20px;
       font-weight: bold;
     }
     #grid {
@@ -39,8 +53,7 @@
     }
     .column h2 {
       text-align: center;
-      font-size: 1.2em;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .course {
       padding: 8px;
@@ -50,22 +63,18 @@
       cursor: pointer;
       transition: transform .1s;
     }
-    .course:hover {
-      transform: scale(1.02);
-    }
+    .course:hover { transform: scale(1.02); }
     .course .credits {
       float: right;
       font-size: 0.85em;
       color: #555;
     }
-    /* Estados */
     .course.approved {
       background: var(--color-approved);
       text-decoration: line-through;
     }
     .course.blocked {
-      background: var(--color-blocked);
-      color: #999;
+      opacity: 0.4;
       cursor: default;
     }
     .course.blocked:hover::after {
@@ -78,7 +87,7 @@
       white-space: nowrap; font-size: 0.85em; margin-top: 4px;
       z-index: 10;
     }
-    /* Colores por categoría */
+    /* Categorías */
     .course.plan      { background: #1565C0; color: #fff; }
     .course.taller    { background: #FBC02D; }
     .course.formacion { background: #C62828; color: #fff; }
@@ -86,17 +95,24 @@
     .course.extra     { background: #5D4037; color: #fff; }
     .course.perfil    { background: #6A1B9A; color: #fff; }
     .course.minor1    { background: #D81B60; color: #fff; }
-
-    
-    /* Aprobados con su color especial */
-    .course.approved  { background: var(--color-approved); text-decoration: line-through; }
-
-    /* Bloqueados atenuados */
-    .course.blocked   { opacity: 0.4; cursor: default; }
   </style>
 </head>
 <body>
+
   <h1>Malla Curricular Interactiva – <span id="career-name"></span></h1>
+
+  <!-- FILTROS -->
+  <div id="filters">
+    <button data-cat="all" class="active">Todas</button>
+    <button data-cat="plan">Plan común</button>
+    <button data-cat="taller">Talleres</button>
+    <button data-cat="formacion">Formación General</button>
+    <button data-cat="major">Major</button>
+    <button data-cat="extra">Extras</button>
+    <button data-cat="perfil">Perfil</button>
+    <button data-cat="minor1">Minor 1</button>
+  </div>
+
   <div id="credit-counter">Créditos aprobados: 0</div>
   <div id="grid"></div>
   <script>
@@ -521,88 +537,74 @@
     ];
 
     const STORAGE_KEY = 'curricularProgress';
-    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
 
-    function saveProgress() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const saveProgress  = ()=> localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const isApproved    = id=> !!progress[id];
+    const isAvailable   = c => c.optional || c.prereqs.every(pid=>isApproved(pid));
+    const toggleCourse  = c => {
+      if(!isApproved(c.id)&&!isAvailable(c)) return;
+      isApproved(c.id)? delete progress[c.id] : progress[c.id]=true;
+      saveProgress(); render();
+    };
+
+    function updateCreditCounter(){
+      const total = courses.reduce((s,c)=> s + (isApproved(c.id)?Number(c.credits):0), 0);
+      document.getElementById('credit-counter')
+              .textContent = `Créditos aprobados: ${total}`;
     }
 
-    function isApproved(id) {
-      return !!progress[id];
-    }
-
-    function isAvailable(course) {
-      return course.optional || course.prereqs.every(pid => isApproved(pid));
-    }
-
-    function toggleCourse(course) {
-      if (!isApproved(course.id) && !isAvailable(course)) return;
-      if (isApproved(course.id)) delete progress[course.id];
-      else progress[course.id] = true;
-      saveProgress();
-      render();
-    }
-
-    function updateCreditCounter() {
-      const total = courses.reduce((sum, c) => (
-        sum + (isApproved(c.id) ? Number(c.credits) : 0)
-      ), 0);
-      document.getElementById('credit-counter').textContent =
-        `Créditos aprobados: ${total}`;
-    }
-
-    function render() {
+    function render(){
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-
-      for (let sem = 1; sem <= 8; sem++) {
+      for(let sem=1; sem<=8; sem++){
         const col = document.createElement('div');
-        col.className = 'column';
-
+        col.className='column';
         const h2 = document.createElement('h2');
-        h2.textContent = 'Semestre ' + sem;
+        h2.textContent='Semestre '+sem;
         col.appendChild(h2);
 
         courses
-          .filter(c => c.year === sem)
-          .forEach(c => {
-            const el   = document.createElement('div');
-            const appr = isApproved(c.id);
-            const avail= isAvailable(c);
+          .filter(c => c.year===sem)
+          .filter(c => activeCategory==='all' || c.category===activeCategory)
+          .forEach(c=>{
+            const el = document.createElement('div');
+            const appr= isApproved(c.id), avail= isAvailable(c);
 
-            // clase base + categoría
             el.className = `course ${c.category}`;
+            if(appr)    el.classList.add('approved');
+            else if(!avail) el.classList.add('blocked');
 
-            // estado aprobado / bloqueado
-            if      (appr)        el.classList.add('approved');
-            else if (!avail)      el.classList.add('blocked');
-
-            // contenido
             el.innerHTML = `
               ${c.name}
               <span class="credits">(${c.credits} cr)</span>
             `;
-
-            // tooltip en bloqueados
-            if (!appr && !avail) {
-              const missing = c.prereqs
-                .filter(pid => !isApproved(pid))
-                .join(', ');
-              el.dataset.tooltip = 'Falta aprobar: ' + missing;
+            if(!appr && !avail){
+              const miss = c.prereqs.filter(pid=>!isApproved(pid)).join(', ');
+              el.dataset.tooltip = 'Falta aprobar: '+miss;
             }
-
-            el.addEventListener('click', () => toggleCourse(c));
+            el.addEventListener('click', ()=>toggleCourse(c));
             col.appendChild(el);
           });
 
         grid.appendChild(col);
       }
-
       updateCreditCounter();
     }
 
-    // inicializa
+    // Inicial y al cambiar filtros
     render();
+
+    document.querySelectorAll('#filters button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelector('#filters button.active')
+                .classList.remove('active');
+        btn.classList.add('active');
+        activeCategory = btn.dataset.cat;
+        render();
+      });
+    });
+
   </script>
 </body>
 </html>
