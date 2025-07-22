@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Curricular Interactiva</title>
+  <style>
+    :root {
+      --color-approved: #c8e6c9;
+      --color-available: #bbdefb;
+      --color-blocked: #f0f0f0;
+      --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      font-family: var(--font);
+      background: #fafafa;
+      color: #333;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    #grid {
+      display: grid;
+      grid-gap: 20px;
+    }
+    .column {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .column h2 {
+      text-align: center;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .course {
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: transform .1s;
+    }
+    .course:hover { transform: scale(1.02); }
+    .course.available { background: var(--color-available); }
+    .course.approved {
+      background: var(--color-approved);
+      text-decoration: line-through;
+    }
+    .course.blocked {
+      background: var(--color-blocked);
+      color: #999;
+      cursor: default;
+    }
+    /* Tooltip personalizado */
+    .course.blocked:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      background: #333; color: #fff;
+      padding: 5px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-size: 0.85em;
+      margin-top: 4px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Malla Curricular Interactiva – <span id="career-name"></span></h1>
+  <div id="grid"></div>
+
+  <script>
+    // ← Cambia aquí el nombre de tu carrera
+    const careerName = "Ingeniería Forestal UC";
+    document.getElementById('career-name').textContent = careerName;
+
+    // ← Reemplaza este array con la lista real de tus cursos
+    const courses = [
+      { id: 'MAT1000', name: 'Precálculo',           year: 1, prereqs: [] },
+      { id: 'QIM201G', name: 'Química General',      year: 1, prereqs: [] },
+      { id: 'AGL101',  name: 'Botánica',             year: 1, prereqs: [] },
+      { id: 'MAT1100', name: 'Cálculo I',            year: 2, prereqs: ['MAT1000'] },
+      { id: 'QIM202',  name: 'Bioquímica General',   year: 2, prereqs: ['QIM201G'] },
+      { id: 'MAT1220', name: 'Cálculo II',           year: 3, prereqs: ['MAT1100'] },
+      { id: 'BIO211G', name: 'Fisiología Vegetal',   year: 3, prereqs: ['AGL101'] },
+      { id: 'AGL201',  name: 'Estadística',          year: 4, prereqs: ['MAT1220'] },
+      // ... añade todos tus cursos aquí ...
+    ];
+
+    // Gestión de progreso en localStorage
+    const STORAGE_KEY = 'curricularProgress';
+    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+    function isApproved(id) {
+      return !!progress[id];
+    }
+    function isAvailable(course) {
+      return course.prereqs.every(pid => isApproved(pid));
+    }
+    function toggleCourse(course) {
+      // Solo permitimos marcar/desmarcar si está aprobado o disponible
+      if (!isApproved(course.id) && !isAvailable(course)) return;
+      if (isApproved(course.id)) {
+        delete progress[course.id];
+      } else {
+        progress[course.id] = true;
+      }
+      saveProgress();
+      render();
+    }
+
+    // Renderizado dinámico
+    function render() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      // Descubrir ciclos (años)
+      const years = [...new Set(courses.map(c => c.year))].sort((a,b)=>a-b);
+      grid.style.gridTemplateColumns = `repeat(${years.length}, 1fr)`;
+
+      years.forEach(year => {
+        const col = document.createElement('div');
+        col.className = 'column';
+        const heading = document.createElement('h2');
+        heading.textContent = 'Ciclo ' + year;
+        col.appendChild(heading);
+
+        courses
+          .filter(c => c.year === year)
+          .forEach(c => {
+            const el = document.createElement('div');
+            const approved = isApproved(c.id);
+            const available = isAvailable(c);
+            el.className = 'course ' + (approved ? 'approved' : available ? 'available' : 'blocked');
+            el.textContent = c.name;
+            // Si está bloqueado, mostramos tooltip con lo que falta
+            if (!approved && !available) {
+              const missing = c.prereqs.filter(pid => !isApproved(pid)).join(', ');
+              el.dataset.tooltip = 'Falta aprobar: ' + missing;
+            }
+            el.addEventListener('click', () => toggleCourse(c));
+            col.appendChild(el);
+          });
+
+        grid.appendChild(col);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
