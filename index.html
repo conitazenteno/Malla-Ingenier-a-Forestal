@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -54,7 +55,11 @@
       color: #999;
       cursor: default;
     }
-    /* Tooltip personalizado */
+    .course .credits {
+      float: right;
+      font-size: 0.85em;
+      color: #555;
+    }
     .course.blocked:hover::after {
       content: attr(data-tooltip);
       position: absolute;
@@ -76,24 +81,246 @@
   <div id="grid"></div>
 
   <script>
-    // ← Cambia aquí el nombre de tu carrera
-    const careerName = "Ingeniería Forestal UC";
+    // Nombre de la carrera (reemplaza por tu nombre)
+    const careerName = "Nombre de la Carrera";
     document.getElementById('career-name').textContent = careerName;
 
-    // ← Reemplaza este array con la lista real de tus cursos
+    // Datos de cursos
     const courses = [
-      { id: 'MAT1000', name: 'Precálculo',           year: 1, prereqs: [] },
-      { id: 'QIM201G', name: 'Química General',      year: 1, prereqs: [] },
-      { id: 'AGL101',  name: 'Botánica',             year: 1, prereqs: [] },
-      { id: 'MAT1100', name: 'Cálculo I',            year: 2, prereqs: ['MAT1000'] },
-      { id: 'QIM202',  name: 'Bioquímica General',   year: 2, prereqs: ['QIM201G'] },
-      { id: 'MAT1220', name: 'Cálculo II',           year: 3, prereqs: ['MAT1100'] },
-      { id: 'BIO211G', name: 'Fisiología Vegetal',   year: 3, prereqs: ['AGL101'] },
-      { id: 'AGL201',  name: 'Estadística',          year: 4, prereqs: ['MAT1220'] },
-      // ... añade todos tus cursos aquí ...
-    ];
+  {
+    "id": "MAT1000",
+    "name": "Precálculo",
+    "year": 1,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "QIM201G",
+    "name": "Química",
+    "year": 1,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGL101",
+    "name": "Botánica",
+    "year": 1,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "MAT1100",
+    "name": "Cálculo 1",
+    "year": 2,
+    "credits": "10",
+    "prereqs": ["MAT1000"]
+  },
+  {
+    "id": "QIM202",
+    "name": "Bioquímica",
+    "year": 2,
+    "credits": "10",
+    "prereqs": ["QIM201G"]
+  },
+  {
+    "id": "MAT1220",
+    "name": "Cálculo 2",
+    "year": 3,
+    "credits": "10",
+    "prereqs": ["MAT1100"]
+  },
+  {
+    "id": "BIO211G",
+    "name": "Fisiología Vegetal",
+    "year": 3,
+    "credits": "10",
+    "prereqs": ["AGL101"]
+  },
+  {
+    "id": "AGL201",
+    "name": "Estadística",
+    "year": 4,
+    "credits": "10",
+    "prereqs": ["MAT1220"]
+  },
+  {
+    "id": "AGL203",
+    "name": "Genética",
+    "year": 4,
+    "credits": "10",
+    "prereqs": ["BIO211G"]
+  },
+  {
+    "id": "AGR200",
+    "name": "Ecología Forestal",
+    "year": 5,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGL110",
+    "name": "Suelos y Fertilidad",
+    "year": 5,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGL112",
+    "name": "Climatología",
+    "year": 5,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR209",
+    "name": "Biodiversidad Vegetal",
+    "year": 6,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR212",
+    "name": "Muestreo y Dinámica de Bosques",
+    "year": 6,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR220",
+    "name": "Silvicultura del Bosque Nativo",
+    "year": 6,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGE206",
+    "name": "Intro a la Economía Ambiental y RRNN",
+    "year": 6,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR205",
+    "name": "Geomática Aplicada a los RRNN",
+    "year": 6,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR339",
+    "name": "Conservación y Biodiversidad",
+    "year": 6,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR301",
+    "name": "Sanidad Forestal",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR303",
+    "name": "Silvicultura Avanzada",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR302",
+    "name": "Manejo y Planificación Forestal",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR305",
+    "name": "Ciencia y Manejo del Fuego",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGE320",
+    "name": "Economía de los Recursos Naturales",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR306",
+    "name": "Estructura e Industria de la Madera",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR304",
+    "name": "Arbolado Urbano",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGR309",
+    "name": "Restauración Ecológica",
+    "year": 7,
+    "credits": "10",
+    "prereqs": []
+  },
+  {
+    "id": "AGC326",
+    "name": "Infraestructura Verde (Capstone)",
+    "year": "Otro",
+    "credits": "",
+    "prereqs": []
+  },
+  {
+    "id": "AGC304",
+    "name": "Arbolado Urbano",
+    "year": "Otro",
+    "credits": "",
+    "prereqs": []
+  },
+  {
+    "id": "AGC311",
+    "name": "Producción de Flores y Ornamentales",
+    "year": "Otro",
+    "credits": "",
+    "prereqs": []
+  },
+  {
+    "id": "AGC220",
+    "name": "Flora Nativa",
+    "year": "Otro",
+    "credits": "",
+    "prereqs": []
+  },
+  {
+    "id": "AGC261",
+    "name": "Material Vegetal y Diseño de Parques y Jardines",
+    "year": "Otro",
+    "credits": "",
+    "prereqs": []
+  },
+  {
+    "id": "AGC250",
+    "name": "Manejo de Céspedes",
+    "year": "Otro",
+    "credits": "",
+    "prereqs": []
+  },
+  {
+    "id": "AGC262",
+    "name": "Manejo del Paisaje",
+    "year": "Otro",
+    "credits": "",
+    "prereqs": []
+  }
+];
 
-    // Gestión de progreso en localStorage
+    // Progreso en localStorage
     const STORAGE_KEY = 'curricularProgress';
     let progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
@@ -107,41 +334,37 @@
       return course.prereqs.every(pid => isApproved(pid));
     }
     function toggleCourse(course) {
-      // Solo permitimos marcar/desmarcar si está aprobado o disponible
       if (!isApproved(course.id) && !isAvailable(course)) return;
-      if (isApproved(course.id)) {
-        delete progress[course.id];
-      } else {
-        progress[course.id] = true;
-      }
+      if (isApproved(course.id)) delete progress[course.id];
+      else progress[course.id] = true;
       saveProgress();
       render();
     }
 
-    // Renderizado dinámico
     function render() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      // Descubrir ciclos (años)
-      const years = [...new Set(courses.map(c => c.year))].sort((a,b)=>a-b);
-      grid.style.gridTemplateColumns = `repeat(${years.length}, 1fr)`;
+      const semKeys = {};
+      courses.forEach(c => {
+        const key = c.year || 'Otro';
+        if (!semKeys[key]) semKeys[key] = [];
+        semKeys[key].push(c);
+      });
+      Object.keys(semKeys)
+        .sort((a,b) => a==='Otro'?1 : b==='Otro'? -1 : a - b)
+        .forEach(year => {
+          const col = document.createElement('div');
+          col.className = 'column';
+          const heading = document.createElement('h2');
+          heading.textContent = year==='Otro' ? 'Otros Requisitos' : 'Ciclo ' + year;
+          col.appendChild(heading);
 
-      years.forEach(year => {
-        const col = document.createElement('div');
-        col.className = 'column';
-        const heading = document.createElement('h2');
-        heading.textContent = 'Ciclo ' + year;
-        col.appendChild(heading);
-
-        courses
-          .filter(c => c.year === year)
-          .forEach(c => {
+          semKeys[year].forEach(c => {
             const el = document.createElement('div');
             const approved = isApproved(c.id);
             const available = isAvailable(c);
             el.className = 'course ' + (approved ? 'approved' : available ? 'available' : 'blocked');
-            el.textContent = c.name;
-            // Si está bloqueado, mostramos tooltip con lo que falta
+            el.innerHTML = `<span class="name">${c.name}</span><span class="credits">(${c.credits} cr)</span>`;
             if (!approved && !available) {
               const missing = c.prereqs.filter(pid => !isApproved(pid)).join(', ');
               el.dataset.tooltip = 'Falta aprobar: ' + missing;
@@ -150,11 +373,13 @@
             col.appendChild(el);
           });
 
-        grid.appendChild(col);
-      });
+          document.getElementById('grid').appendChild(col);
+        });
     }
 
     render();
   </script>
 </body>
 </html>
+```
+
