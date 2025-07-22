@@ -535,55 +535,61 @@
         "category": "extra"
       }
     ];
+    let activeCategory = 'all';
 
+    // 3) Lógica de progreso y filtros
     const STORAGE_KEY = 'curricularProgress';
-    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY))||{};
+    let progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-    const saveProgress  = ()=> localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    const isApproved    = id=> !!progress[id];
-    const isAvailable   = c => c.optional || c.prereqs.every(pid=>isApproved(pid));
+    const saveProgress  = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const isApproved    = id => !!progress[id];
+    const isAvailable   = c => c.optional || c.prereqs.every(pid => isApproved(pid));
     const toggleCourse  = c => {
-      if(!isApproved(c.id)&&!isAvailable(c)) return;
-      isApproved(c.id)? delete progress[c.id] : progress[c.id]=true;
-      saveProgress(); render();
+      if (!isApproved(c.id) && !isAvailable(c)) return;
+      isApproved(c.id) ? delete progress[c.id] : progress[c.id] = true;
+      saveProgress();
+      render();
     };
 
-    function updateCreditCounter(){
-      const total = courses.reduce((s,c)=> s + (isApproved(c.id)?Number(c.credits):0), 0);
+    function updateCreditCounter() {
+      const total = courses.reduce((sum, c) =>
+        sum + (isApproved(c.id) ? Number(c.credits) : 0)
+      , 0);
       document.getElementById('credit-counter')
               .textContent = `Créditos aprobados: ${total}`;
     }
 
-    function render(){
+    function render() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      for(let sem=1; sem<=8; sem++){
+      for (let sem = 1; sem <= 8; sem++) {
         const col = document.createElement('div');
-        col.className='column';
+        col.className = 'column';
         const h2 = document.createElement('h2');
-        h2.textContent='Semestre '+sem;
+        h2.textContent = 'Semestre ' + sem;
         col.appendChild(h2);
 
         courses
-          .filter(c => c.year===sem)
-          .filter(c => activeCategory==='all' || c.category===activeCategory)
-          .forEach(c=>{
-            const el = document.createElement('div');
-            const appr= isApproved(c.id), avail= isAvailable(c);
+          .filter(c => c.year === sem)
+          .filter(c => activeCategory === 'all' || c.category === activeCategory)
+          .forEach(c => {
+            const el    = document.createElement('div');
+            const appr  = isApproved(c.id);
+            const avail = isAvailable(c);
 
             el.className = `course ${c.category}`;
-            if(appr)    el.classList.add('approved');
-            else if(!avail) el.classList.add('blocked');
+            if      (appr)    el.classList.add('approved');
+            else if (!avail)  el.classList.add('blocked');
 
             el.innerHTML = `
               ${c.name}
               <span class="credits">(${c.credits} cr)</span>
             `;
-            if(!appr && !avail){
-              const miss = c.prereqs.filter(pid=>!isApproved(pid)).join(', ');
-              el.dataset.tooltip = 'Falta aprobar: '+miss;
+            if (!appr && !avail) {
+              const missing = c.prereqs.filter(pid => !isApproved(pid)).join(', ');
+              el.dataset.tooltip = 'Falta aprobar: ' + missing;
             }
-            el.addEventListener('click', ()=>toggleCourse(c));
+            el.addEventListener('click', () => toggleCourse(c));
             col.appendChild(el);
           });
 
@@ -592,11 +598,12 @@
       updateCreditCounter();
     }
 
-    // Inicial y al cambiar filtros
+    // Inicializamos la malla
     render();
 
-    document.querySelectorAll('#filters button').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
+    // Manejador de filtros
+    document.querySelectorAll('#filters button').forEach(btn => {
+      btn.addEventListener('click', () => {
         document.querySelector('#filters button.active')
                 .classList.remove('active');
         btn.classList.add('active');
@@ -604,7 +611,6 @@
         render();
       });
     });
-
   </script>
 </body>
 </html>
